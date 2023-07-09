@@ -153,7 +153,7 @@ class Vec {
         return os;
     }
 
-    friend Vec<T, N>& operator*(const T& scalar, Vec<T, N> vec) {
+    friend Vec<T, N> operator*(const T& scalar, const Vec<T, N>& vec) {
         return vec * scalar;
     }
 
@@ -162,3 +162,4 @@ class Vec {
 };
 
 using Vec3d = Vec<double, 3>;
+using Point3d = Vec3d;
