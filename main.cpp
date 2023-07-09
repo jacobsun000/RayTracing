@@ -2,19 +2,21 @@
 #include <iomanip>
 #include <iostream>
 
+#include "Camera.h"
 #include "Color.h"
-#include "Geometry.h"
+#include "Common.h"
+#include "GeometryList.h"
 #include "Ray.h"
-#include "Vector.h"
+#include "Sphere.h"
 
-Color ray_color(const Ray ray) {
-    Sphere sphere({0, 0, -1}, 0.5);
-    if (sphere.hit(ray)) {
-        return Color{1, 0, 0};
+Color ray_color(const Ray& r, const Geometry& world) {
+    HitRecord rec;
+    if (world.hit(r, 0, INF, rec)) {
+        return 0.5 * (rec.normal + Color{1, 1, 1});
     }
-    Vec3d unit_direction = ray.direction().unit_vector();
+    Vec3d unit_direction = r.direction().unit_vector();
     auto t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * Color{1.0, 1.0, 1.0} + t *Color{0.5, 0.7, 1.0};
+    return (1.0 - t) * Color{1.0, 1.0, 1.0} + t* Color{0.5, 0.7, 1.0};
 }
 
 int main(int argc, char const *argv[]) {
@@ -22,19 +24,17 @@ int main(int argc, char const *argv[]) {
     const auto aspect_ratio = 16.0 / 9.0;
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
+    const int samples_per_pixel = 100;
 
     // Camera
-    auto viewport_height = 2.0;
-    auto viewport_width = aspect_ratio * viewport_height;
-    auto focal_length = 1.0;
-
-    Point3d origin{0, 0, 0};
-    Vec3d horizontal{viewport_width, 0, 0};
-    Vec3d vertical{0, viewport_height, 0};
-    Vec3d lower_left_corner =
-        origin - horizontal / 2 - vertical / 2 - Vec3d{0, 0, focal_length};
+    Camera cam;
 
     std::ofstream outfile("test.ppm");
+
+    // World
+    GeometryList world;
+    world.add(make_shared<Sphere>(Point3d{0, 0, -1}, 0.5));
+    world.add(make_shared<Sphere>(Point3d{0, -100.5, -1}, 100));
 
     // PPM file header
     outfile << "P3" << std::endl
@@ -47,12 +47,14 @@ int main(int argc, char const *argv[]) {
                   << (double)(image_height - j) / (image_height)*100 << '%'
                   << std::endl;
         for (int i = 0; i < image_width; ++i) {
-            auto u = double(i) / (image_width - 1);
-            auto v = double(j) / (image_height - 1);
-            Ray r(origin,
-                  lower_left_corner + u * horizontal + v * vertical - origin);
-            Color pixel_color = ray_color(r);
-            write_color(outfile, pixel_color);
+            Color pixel_color{0, 0, 0};
+            for (int s = 0; s < samples_per_pixel; ++s) {
+                auto u = (i + random_double()) / (image_width - 1);
+                auto v = (j + random_double()) / (image_height - 1);
+                Ray r = cam.get_ray(u, v);
+                pixel_color += ray_color(r, world);
+            }
+            write_color(outfile, pixel_color, samples_per_pixel);
         }
     }
     std::cout << "Done" << std::endl;

@@ -13,7 +13,7 @@ class Ray {
 
     Point3d at(double t) const { return _origin + t * _direction; }
 
-   public:
+   private:
     Point3d _origin;
     Vec3d _direction;
 };

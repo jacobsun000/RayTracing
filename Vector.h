@@ -116,30 +116,30 @@ class Vec {
         return result;
     }
 
-    Vec<T, N>& operator+=(const Vec<T, N>& other) const {
-        for (T& value : _data) {
-            value += other;
+    Vec<T, N>& operator+=(const Vec<T, N>& other) {
+        for (size_t i = 0; i < N; i++) {
+            _data[i] += other[i];
         }
         return *this;
     }
 
-    Vec<T, N>& operator-=(const Vec<T, N>& other) const {
-        for (T& value : _data) {
-            value -= other;
+    Vec<T, N>& operator-=(const Vec<T, N>& other) {
+        for (size_t i = 0; i < N; i++) {
+            _data[i] -= other[i];
         }
         return *this;
     }
 
-    Vec<T, N>& operator*=(const Vec<T, N>& other) const {
-        for (T& value : _data) {
-            value *= other;
+    Vec<T, N>& operator*=(const Vec<T, N>& other) {
+        for (size_t i = 0; i < N; i++) {
+            _data[i] *= other[i];
         }
         return *this;
     }
 
-    Vec<T, N>& operator/=(const Vec<T, N>& other) const {
-        for (T& value : _data) {
-            value /= other;
+    Vec<T, N>& operator/=(const Vec<T, N>& other) {
+        for (size_t i = 0; i < N; i++) {
+            _data[i] /= other[i];
         }
         return *this;
     }

@@ -1,27 +1,25 @@
 #pragma once
 
+#include <cmath>
+
 #include "Ray.h"
 #include "Vector.h"
+
+struct HitRecord {
+    Point3d point;
+    Vec3d normal;
+    double t;
+    bool front_face;
+    inline void set_face_normal(const Ray& r, const Vec3d& outward_normal) {
+        front_face = r.direction() * outward_normal < 0;
+        normal = front_face ? outward_normal : -outward_normal;
+    }
+};
 
 class Geometry {
    public:
     virtual ~Geometry() = default;
-    virtual bool hit(const Ray& ray) const = 0;
-};
-
-class Sphere : Geometry {
-   public:
-    Sphere(Point3d center, double radius) : _center(center), _radius(radius) {}
-    bool hit(const Ray& ray) const override {
-        Vec3d oc = ray.origin() - _center;
-        Vec3d a = ray.direction() * ray.direction();
-        Vec3d b = 2.0 * oc * ray.direction();
-        Vec3d c = oc * oc - _radius * _radius;
-        double discriminant = b * b - 4 * a * c;
-        return discriminant > 0;
-    }
-
-   private:
-    Point3d _center;
-    double _radius;
+    // Returns normal
+    virtual bool hit(const Ray& ray, double t_min, double t_max,
+                     HitRecord& r_rec) const = 0;
 };
