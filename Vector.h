@@ -52,7 +52,7 @@ class Vec {
 
     Vec<T, N> unit_vector() const { return (*this) / length(); }
 
-    Vec<T, N> dot(Vec<T, N> other) { return (*this) * other; }
+    T dot(Vec<T, N> other) { return (*this) * other; }
 
     Vec<T, N> cross(const Vec<T, N>& other) const {
         static_assert(
@@ -67,6 +67,14 @@ class Vec {
     T& operator[](size_t index) { return _data[index]; }
 
     const T& operator[](size_t index) const { return _data[index]; }
+
+    T operator*(const Vec<T, N>& other) const {
+        T result = 0;
+        for (size_t i = 0; i < N; ++i) {
+            result += _data[i] * other[i];
+        }
+        return result;
+    }
 
     Vec<T, N> operator-() const {
         Vec<T, N> result;
@@ -96,14 +104,6 @@ class Vec {
         Vec<T, N> result;
         for (size_t i = 0; i < N; ++i) {
             result[i] = _data[i] * scalar;
-        }
-        return result;
-    }
-
-    Vec<T, N> operator*(const Vec<T, N>& other) const {
-        Vec<T, N> result;
-        for (size_t i = 0; i < N; ++i) {
-            result[i] = _data[i] * other[i];
         }
         return result;
     }
