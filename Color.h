@@ -3,7 +3,10 @@
 #include <fstream>
 
 #include "Common.h"
+#include "Math.h"
 #include "Vector.h"
+
+using namespace Math;
 
 using Color = Vec3d;
 

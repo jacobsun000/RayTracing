@@ -6,8 +6,11 @@
 #include "Color.h"
 #include "Common.h"
 #include "GeometryList.h"
+#include "Math.h"
 #include "Ray.h"
 #include "Sphere.h"
+
+using namespace Math;
 
 Color ray_color(const Ray& r, const Geometry& world) {
     HitRecord rec;
