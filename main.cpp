@@ -12,10 +12,13 @@
 
 using namespace Math;
 
-Color ray_color(const Ray& r, const Geometry& world) {
+Color ray_color(const Ray& r, const Geometry& world, int depth) {
+    if (depth <= 0) return Color{0, 0, 0};
     HitRecord rec;
     if (world.hit(r, 0, INF, rec)) {
-        return 0.5 * (rec.normal + Color{1, 1, 1});
+        Point3d target = rec.point + rec.normal + random_in_unit_sphere();
+        Ray reflection(rec.point, target - rec.point);
+        return 0.5 * ray_color(reflection, world, depth - 1);
     }
     Vec3d unit_direction = r.direction().unit_vector();
     auto t = 0.5 * (unit_direction.y() + 1.0);
@@ -28,6 +31,7 @@ int main(int argc, char const *argv[]) {
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
     const int samples_per_pixel = 100;
+    const int max_depth = 50;
 
     // Camera
     Camera cam;
@@ -55,7 +59,7 @@ int main(int argc, char const *argv[]) {
                 auto u = (i + random_double()) / (image_width - 1);
                 auto v = (j + random_double()) / (image_height - 1);
                 Ray r = cam.get_ray(u, v);
-                pixel_color += ray_color(r, world);
+                pixel_color += ray_color(r, world, max_depth);
             }
             write_color(outfile, pixel_color, samples_per_pixel);
         }

@@ -4,6 +4,8 @@
 #include <limits>
 #include <random>
 
+#include "Vector.h"
+
 namespace Math {
 
 const double INF = std::numeric_limits<double>::infinity();
@@ -32,4 +34,5 @@ inline double clamp(double x, double min, double max) {
     if (x > max) return max;
     return x;
 }
+
 };  // namespace Math

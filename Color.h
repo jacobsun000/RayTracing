@@ -6,8 +6,6 @@
 #include "Math.h"
 #include "Vector.h"
 
-using namespace Math;
-
 using Color = Vec3d;
 
 void write_color(std::ostream &out, Color pixel_color, int samples_per_pixel) {
@@ -20,9 +18,11 @@ void write_color(std::ostream &out, Color pixel_color, int samples_per_pixel) {
     r *= scale;
     g *= scale;
     b *= scale;
+    auto convert_color = [](double val) {
+        return static_cast<int>(256 * Math::clamp(val, 0.0, 0.999));
+    };
 
     // Write the translated [0,255] value of each color component.
-    out << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
-        << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
-        << static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
+    out << convert_color(r) << ' ' << convert_color(g) << ' '
+        << convert_color(b) << '\n';
 }

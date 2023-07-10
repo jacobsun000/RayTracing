@@ -1,9 +1,10 @@
 #pragma once
 
 #include <array>
-#include <cmath>
 #include <initializer_list>
 #include <iostream>
+
+#include "Math.h"
 
 template <typename T, size_t N>
 class Vec {
@@ -157,9 +158,29 @@ class Vec {
         return vec * scalar;
     }
 
+    static Vec<T, N> random(double min, double max) {
+        auto rand = [&]() { return Math::random_double(min, max); };
+        return {rand(), rand(), rand()};
+    }
+
+    static Vec<T, N> random() {
+        auto rand = []() { return Math::random_double(); };
+        return {rand(), rand(), rand()};
+    }
+
    private:
     std::array<T, N> _data;
 };
 
 using Vec3d = Vec<double, 3>;
 using Point3d = Vec3d;
+
+namespace Math {
+inline Vec3d random_in_unit_sphere() {
+    Vec3d p;
+    do {
+        p = Vec3d::random(-1, 1);
+    } while (p.length_squared() >= 1);
+    return p;
+}
+}  // namespace Math
