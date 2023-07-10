@@ -38,20 +38,28 @@ int main(int argc, char const *argv[]) {
     const int max_depth = 50;
     std::ofstream outfile("test.ppm");
 
-    // Camera
-    Camera cam;
-
     // World
     GeometryList world;
-    auto m_ground = make_shared<Lambertian>(Color{0.8, 0.8, 0.0});
-    auto m_center = make_shared<Dielectric>(1.5);
-    auto m_left = make_shared<Dielectric>(1.5);
-    auto m_right = make_shared<Metal>(Color{0.8, 0.6, 0.2}, 1.0);
 
-    world.add(make_shared<Sphere>(m_ground, Point3d{0.0, -100.5, -1.0}, 100.0));
-    world.add(make_shared<Sphere>(m_center, Point3d{0.0, 0.0, -1.0}, 0.5));
-    world.add(make_shared<Sphere>(m_left, Point3d{-1.0, 0.0, -1.0}, 0.5));
-    world.add(make_shared<Sphere>(m_right, Point3d{1.0, 0.0, -1.0}, 0.5));
+    auto material_ground = make_shared<Lambertian>(Color{0.8, 0.8, 0.0});
+    auto material_center = make_shared<Lambertian>(Color{0.1, 0.2, 0.5});
+    auto material_left = make_shared<Dielectric>(1.5);
+    auto material_right = make_shared<Metal>(Color{0.8, 0.6, 0.2}, 0.0);
+
+    world.add(make_shared<Sphere>(Point3d{0.0, -100.5, -1.0}, 100.0,
+                                  material_ground));
+    world.add(
+        make_shared<Sphere>(Point3d{0.0, 0.0, -1.0}, 0.5, material_center));
+    world.add(
+        make_shared<Sphere>(Point3d{-1.0, 0.0, -1.0}, 0.5, material_left));
+    world.add(
+        make_shared<Sphere>(Point3d{-1.0, 0.0, -1.0}, -0.45, material_left));
+    world.add(
+        make_shared<Sphere>(Point3d{1.0, 0.0, -1.0}, 0.5, material_right));
+
+    // Camera
+    Camera cam(Point3d{-2, 2, 1}, Point3d{0, 0, -1}, Vec3d{0, 1, 0}, 20,
+               aspect_ratio);
 
     // PPM file header
     outfile << "P3" << std::endl

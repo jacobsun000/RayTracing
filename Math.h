@@ -11,9 +11,9 @@ namespace Math {
 const double INF = std::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
 
-inline double degrees_to_radians(double degrees) {
-    return degrees * PI / 180.0;
-}
+inline double deg_to_rad(double degrees) { return degrees * PI / 180.0; }
+
+inline double rad_to_deg(double radians) { return radians / PI * 180.0; }
 
 inline double random_double() {
     // Returns a random real in [0,1).

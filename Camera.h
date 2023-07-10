@@ -3,22 +3,28 @@
 
 class Camera {
    public:
-    Camera() {
-        auto aspect_ratio = 16.0 / 9.0;
-        auto viewport_height = 2.0;
+    Camera(Point3d lookfrom, Point3d lookat, Vec3d vup,
+           double vfov,  // vertical field-of-view in degrees
+           double aspect_ratio) {
+        auto theta = Math::deg_to_rad(vfov);
+        auto h = tan(theta / 2);
+        auto viewport_height = 2.0 * h;
         auto viewport_width = aspect_ratio * viewport_height;
-        auto focal_length = 1.0;
 
-        _origin = Point3d{0, 0, 0};
-        _horizontal = Vec3d{viewport_width, 0.0, 0.0};
-        _vertical = Vec3d{0.0, viewport_height, 0.0};
-        _lower_left_corner = _origin - _horizontal / 2 - _vertical / 2 -
-                             Vec3d{0, 0, focal_length};
+        auto w = (lookfrom - lookat).unit_vector();
+        auto u = (vup.cross(w)).unit_vector();
+        ;
+        auto v = w.cross(u);
+
+        _origin = lookfrom;
+        _horizontal = viewport_width * u;
+        _vertical = viewport_height * v;
+        _lower_left_corner = _origin - _horizontal / 2 - _vertical / 2 - w;
     }
 
-    Ray get_ray(double u, double v) const {
-        return Ray(_origin, _lower_left_corner + u * _horizontal +
-                                v * _vertical - _origin);
+    Ray get_ray(double s, double t) const {
+        return Ray(_origin, _lower_left_corner + s * _horizontal +
+                                t * _vertical - _origin);
     }
 
    private:

@@ -4,7 +4,7 @@
 
 class Sphere : public Geometry {
    public:
-    Sphere(shared_ptr<Material> material, Point3d center, double radius)
+    Sphere(Point3d center, double radius, shared_ptr<Material> material)
         : Geometry(material), _center(center), _radius(radius) {}
     bool hit(const Ray& ray, double t_min, double t_max,
              HitRecord& r_rec) const override {
