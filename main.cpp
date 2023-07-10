@@ -8,6 +8,7 @@
 #include "GeometryList.h"
 #include "Material.h"
 #include "Math.h"
+#include "ProgressBar.h"
 #include "Ray.h"
 #include "Sphere.h"
 
@@ -58,10 +59,7 @@ int main(int argc, char const *argv[]) {
             << 255 << std::endl;
 
     for (int j = image_height - 1; j >= 0; --j) {
-        std::cout << "Rendering progress: " << std::fixed
-                  << std::setprecision(2)
-                  << (double)(image_height - j) / (image_height)*100 << '%'
-                  << '\r' << std::flush;
+        showProgressBar((double)(image_height - j) / image_height);
         for (int i = 0; i < image_width; ++i) {
             Color pixel_color{0, 0, 0};
             for (int s = 0; s < samples_per_pixel; ++s) {
@@ -73,6 +71,5 @@ int main(int argc, char const *argv[]) {
             write_color(outfile, pixel_color, samples_per_pixel);
         }
     }
-    std::cout << std::endl;
     return 0;
 }
