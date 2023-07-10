@@ -1,3 +1,5 @@
-.vscode/settings.json
+.vscode/*
 test.ppm
-.vscode/launch.json
+CMakeFiles/*
+Makefile
+main

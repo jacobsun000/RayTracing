@@ -15,7 +15,7 @@ using namespace Math;
 Color ray_color(const Ray& r, const Geometry& world, int depth) {
     if (depth <= 0) return Color{0, 0, 0};
     HitRecord rec;
-    if (world.hit(r, 0, INF, rec)) {
+    if (world.hit(r, 0.001, INF, rec)) {
         Point3d target = rec.point + rec.normal + random_in_unit_sphere();
         Ray reflection(rec.point, target - rec.point);
         return 0.5 * ray_color(reflection, world, depth - 1);
