@@ -1,4 +1,4 @@
 cd build
-cmake ..
+cmake .. > /dev/null
 make
 ./main
