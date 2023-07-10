@@ -1,12 +1,25 @@
 #pragma once
 
 #include <fstream>
+#include <sstream>
+#include <string>
 
 #include "Common.h"
 #include "Math.h"
 #include "Vector.h"
 
 using Color = Vec3d;
+
+Color from_hex(const std::string& hexColor) {
+    std::istringstream iss(hexColor.substr(1));
+    int hexValue;
+    iss >> std::hex >> hexValue;
+
+    double r = ((hexValue >> 16) & 0xFF) / 255.0;
+    double g = ((hexValue >> 8) & 0xFF) / 255.0;
+    double b = ((hexValue >> 0) & 0xFF) / 255.0;
+    return {r, g, b};
+}
 
 void write_color(std::ostream &out, Color pixel_color, int samples_per_pixel) {
     auto r = pixel_color.x();
