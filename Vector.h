@@ -53,7 +53,20 @@ class Vec {
 
     Vec<T, N> unit_vector() const { return (*this) / length(); }
 
-    T dot(Vec<T, N> other) { return (*this) * other; }
+    bool near_zero() const {
+        // Return true if the vector is close to zero in all dimensions.
+        const auto s = 1e-8;
+        return (fabs(_data[0]) < s) && (fabs(_data[1]) < s) &&
+               (fabs(_data[2]) < s);
+    }
+
+    T dot(const Vec<T, N>& other) const {
+        T result = 0;
+        for (size_t i = 0; i < N; ++i) {
+            result += _data[i] * other[i];
+        }
+        return result;
+    }
 
     Vec<T, N> cross(const Vec<T, N>& other) const {
         static_assert(
@@ -68,14 +81,6 @@ class Vec {
     T& operator[](size_t index) { return _data[index]; }
 
     const T& operator[](size_t index) const { return _data[index]; }
-
-    T operator*(const Vec<T, N>& other) const {
-        T result = 0;
-        for (size_t i = 0; i < N; ++i) {
-            result += _data[i] * other[i];
-        }
-        return result;
-    }
 
     Vec<T, N> operator-() const {
         Vec<T, N> result;
@@ -97,6 +102,14 @@ class Vec {
         Vec<T, N> result;
         for (size_t i = 0; i < N; ++i) {
             result[i] = _data[i] - other[i];
+        }
+        return result;
+    }
+
+    Vec<T, N> operator*(const Vec<T, N>& other) const {
+        Vec<T, N> result;
+        for (size_t i = 0; i < N; ++i) {
+            result[i] = _data[i] * other[i];
         }
         return result;
     }
@@ -186,10 +199,13 @@ inline Vec3d random_in_unit_sphere() {
 
 Vec3d random_in_hemisphere(const Vec3d& normal) {
     Vec3d in_unit_sphere = random_in_unit_sphere();
-    if (in_unit_sphere * normal > 0.0)  // In the same hemisphere as the normal
+    // In the same hemisphere as the normal
+    if (in_unit_sphere.dot(normal) > 0.0)
         return in_unit_sphere;
     else
         return -in_unit_sphere;
 }
+
+Vec3d random_unit_vector() { return random_in_unit_sphere().unit_vector(); }
 
 }  // namespace Math

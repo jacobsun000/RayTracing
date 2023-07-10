@@ -4,12 +4,13 @@
 
 class Sphere : public Geometry {
    public:
-    Sphere(Point3d center, double radius) : _center(center), _radius(radius) {}
+    Sphere(shared_ptr<Material> material, Point3d center, double radius)
+        : Geometry(material), _center(center), _radius(radius) {}
     bool hit(const Ray& ray, double t_min, double t_max,
              HitRecord& r_rec) const override {
         Vec3d oc = ray.origin() - _center;
         double a = ray.direction().length_squared();
-        double half_b = oc * ray.direction();
+        double half_b = oc.dot(ray.direction());
         double c = oc.length_squared() - _radius * _radius;
 
         double discriminant = half_b * half_b - a * c;
@@ -27,6 +28,7 @@ class Sphere : public Geometry {
         r_rec.point = ray.at(r_rec.t);
         Vec3d outward_normal = (r_rec.point - _center) / _radius;
         r_rec.set_face_normal(ray, outward_normal);
+        r_rec.material = _material;
 
         return true;
     }

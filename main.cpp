@@ -6,6 +6,7 @@
 #include "Color.h"
 #include "Common.h"
 #include "GeometryList.h"
+#include "Material.h"
 #include "Math.h"
 #include "Ray.h"
 #include "Sphere.h"
@@ -16,9 +17,11 @@ Color ray_color(const Ray& r, const Geometry& world, int depth) {
     if (depth <= 0) return Color{0, 0, 0};
     HitRecord rec;
     if (world.hit(r, 0.001, INF, rec)) {
-        Point3d target = rec.point + random_in_hemisphere(rec.normal);
-        Ray reflection(rec.point, target - rec.point);
-        return 0.5 * ray_color(reflection, world, depth - 1);
+        Ray scattered;
+        Color attenuation;
+        if (rec.material->scatter(r, rec, attenuation, scattered))
+            return attenuation * ray_color(scattered, world, depth - 1);
+        return Color{0, 0, 0};
     }
     Vec3d unit_direction = r.direction().unit_vector();
     auto t = 0.5 * (unit_direction.y() + 1.0);
@@ -32,16 +35,22 @@ int main(int argc, char const *argv[]) {
     const int image_height = static_cast<int>(image_width / aspect_ratio);
     const int samples_per_pixel = 100;
     const int max_depth = 50;
+    std::ofstream outfile("test.ppm");
 
     // Camera
     Camera cam;
 
-    std::ofstream outfile("test.ppm");
-
     // World
     GeometryList world;
-    world.add(make_shared<Sphere>(Point3d{0, 0, -1}, 0.5));
-    world.add(make_shared<Sphere>(Point3d{0, -100.5, -1}, 100));
+    auto m_ground = make_shared<Lambertian>(Color{0.8, 0.8, 0.0});
+    auto m_center = make_shared<Dielectric>(1.5);
+    auto m_left = make_shared<Dielectric>(1.5);
+    auto m_right = make_shared<Metal>(Color{0.8, 0.6, 0.2}, 1.0);
+
+    world.add(make_shared<Sphere>(m_ground, Point3d{0.0, -100.5, -1.0}, 100.0));
+    world.add(make_shared<Sphere>(m_center, Point3d{0.0, 0.0, -1.0}, 0.5));
+    world.add(make_shared<Sphere>(m_left, Point3d{-1.0, 0.0, -1.0}, 0.5));
+    world.add(make_shared<Sphere>(m_right, Point3d{1.0, 0.0, -1.0}, 0.5));
 
     // PPM file header
     outfile << "P3" << std::endl
@@ -52,7 +61,7 @@ int main(int argc, char const *argv[]) {
         std::cout << "Rendering progress: " << std::fixed
                   << std::setprecision(2)
                   << (double)(image_height - j) / (image_height)*100 << '%'
-                  << std::endl;
+                  << '\r' << std::flush;
         for (int i = 0; i < image_width; ++i) {
             Color pixel_color{0, 0, 0};
             for (int s = 0; s < samples_per_pixel; ++s) {
@@ -64,6 +73,6 @@ int main(int argc, char const *argv[]) {
             write_color(outfile, pixel_color, samples_per_pixel);
         }
     }
-    std::cout << "Done" << std::endl;
+    std::cout << std::endl;
     return 0;
 }

@@ -9,11 +9,13 @@ using std::shared_ptr;
 
 class GeometryList : public Geometry {
    public:
-    GeometryList() {}
-    GeometryList(shared_ptr<Geometry> object) { add(object); }
+    GeometryList() : Geometry(nullptr) {}
+    GeometryList(shared_ptr<Geometry> object) : Geometry(nullptr) {
+        add(object);
+    }
 
-    void clear() { geometries.clear(); }
-    void add(shared_ptr<Geometry> object) { geometries.push_back(object); }
+    void clear() { _geometries.clear(); }
+    void add(shared_ptr<Geometry> object) { _geometries.push_back(object); }
 
     virtual bool hit(const Ray& r, double t_min, double t_max,
                      HitRecord& rec) const override {
@@ -21,7 +23,7 @@ class GeometryList : public Geometry {
         bool hit_anything = false;
         auto closest_so_far = t_max;
 
-        for (const auto& geometry : geometries) {
+        for (const auto& geometry : _geometries) {
             if (geometry->hit(r, t_min, closest_so_far, temp_rec)) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
@@ -31,6 +33,6 @@ class GeometryList : public Geometry {
         return hit_anything;
     }
 
-   public:
-    std::vector<shared_ptr<Geometry>> geometries;
+   private:
+    std::vector<shared_ptr<Geometry>> _geometries;
 };
