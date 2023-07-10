@@ -1,5 +1,2 @@
 .vscode/*
-test.ppm
-CMakeFiles/*
-Makefile
-main
+build/*
