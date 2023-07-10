@@ -1,6 +1,6 @@
 #pragma once
-
 #include <array>
+#include <functional>
 #include <initializer_list>
 #include <iostream>
 
@@ -78,90 +78,87 @@ class Vec {
         return result;
     }
 
+    template <typename U = T>
+    Vec<U, N> map(std::function<U(T)> func) const {
+        Vec<U, N> result;
+        for (size_t i = 0; i < N; i++) {
+            result[i] = func(_data[i]);
+        }
+        return result;
+    }
+
+    template <typename U = T>
+    Vec<U, N> map(std::function<U(T, size_t)> func) const {
+        Vec<U, N> result;
+        for (size_t i = 0; i < N; i++) {
+            result[i] = func(_data[i], i);
+        }
+        return result;
+    }
+
+    Vec<T, N>& apply(std::function<void(T&)> func) {
+        for (T& value : _data) {
+            func(value);
+        }
+        return *this;
+    }
+
+    Vec<T, N>& apply(std::function<void(T&, size_t)> func) {
+        for (size_t i = 0; i < N; i++) {
+            func(_data[i], i);
+        }
+        return *this;
+    }
+
     T& operator[](size_t index) { return _data[index]; }
 
     const T& operator[](size_t index) const { return _data[index]; }
 
     Vec<T, N> operator-() const {
-        Vec<T, N> result;
-        for (size_t i = 0; i < N; i++) {
-            result[i] = -_data[i];
-        }
-        return result;
+        return map<T>([](T val) { return -val; });
     }
 
     Vec<T, N> operator+(const Vec<T, N>& other) const {
-        Vec<T, N> result;
-        for (size_t i = 0; i < N; ++i) {
-            result[i] = _data[i] + other[i];
-        }
-        return result;
+        return map<T>([&](T val, size_t i) { return val + other[i]; });
     }
 
     Vec<T, N> operator-(const Vec<T, N>& other) const {
-        Vec<T, N> result;
-        for (size_t i = 0; i < N; ++i) {
-            result[i] = _data[i] - other[i];
-        }
-        return result;
+        return map<T>([&](T val, size_t i) { return val - other[i]; });
     }
 
     Vec<T, N> operator*(const Vec<T, N>& other) const {
-        Vec<T, N> result;
-        for (size_t i = 0; i < N; ++i) {
-            result[i] = _data[i] * other[i];
-        }
-        return result;
+        return map<T>([&](T val, size_t i) { return val * other[i]; });
     }
 
     Vec<T, N> operator*(const T& scalar) const {
-        Vec<T, N> result;
-        for (size_t i = 0; i < N; ++i) {
-            result[i] = _data[i] * scalar;
-        }
-        return result;
+        return map<T>([&](T val) { return val * scalar; });
     }
 
     Vec<T, N> operator/(const T& scalar) const {
-        Vec<T, N> result;
-        for (size_t i = 0; i < N; ++i) {
-            result[i] = _data[i] / scalar;
-        }
-        return result;
+        return map<T>([&](T val) { return val / scalar; });
     }
 
     Vec<T, N>& operator+=(const Vec<T, N>& other) {
-        for (size_t i = 0; i < N; i++) {
-            _data[i] += other[i];
-        }
-        return *this;
+        return apply([&](T& val, size_t i) { val += other[i]; });
     }
 
     Vec<T, N>& operator-=(const Vec<T, N>& other) {
-        for (size_t i = 0; i < N; i++) {
-            _data[i] -= other[i];
-        }
-        return *this;
+        return apply([&](T& val, size_t i) { val -= other[i]; });
     }
 
     Vec<T, N>& operator*=(const Vec<T, N>& other) {
-        for (size_t i = 0; i < N; i++) {
-            _data[i] *= other[i];
-        }
-        return *this;
+        return apply([&](T& val, size_t i) { val *= other[i]; });
     }
 
     Vec<T, N>& operator/=(const Vec<T, N>& other) {
-        for (size_t i = 0; i < N; i++) {
-            _data[i] /= other[i];
-        }
-        return *this;
+        return apply([&](T& val, size_t i) { val /= other[i]; });
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec<T, N>& vec) {
         os << "[ ";
+        os << vec[0];
         for (std::size_t i = 0; i < N; i++) {
-            os << vec[i] << (i < N - 1 ? ", " : " ");
+            os << ", " << vec[i];
         }
         os << "]";
         return os;
