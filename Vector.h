@@ -189,10 +189,18 @@ using Vec3d = Vec<double, 3>;
 using Point3d = Vec3d;
 
 namespace Math {
-inline Vec3d random_in_unit_sphere() {
+Vec3d random_in_unit_sphere() {
     Vec3d p;
     do {
         p = Vec3d::random(-1, 1);
+    } while (p.length_squared() >= 1);
+    return p;
+}
+
+Vec3d random_in_unit_disk() {
+    Vec3d p;
+    do {
+        p = Vec3d{Math::random_double(), Math::random_double(), 0};
     } while (p.length_squared() >= 1);
     return p;
 }
