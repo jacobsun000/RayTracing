@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "Camera.h"
-#include "Common.h"
 #include "Image.h"
 #include "RenderingOption.h"
 #include "Scene.h"

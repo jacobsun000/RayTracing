@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Color.h"
-#include "Common.h"
 #include "Geometry.h"
 
 Vec3d reflect(const Vec3d& v, const Vec3d& n) { return v - 2 * v.dot(n) * n; }

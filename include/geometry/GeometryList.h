@@ -1,11 +1,8 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 
 #include "Geometry.h"
-
-using std::shared_ptr;
 
 class GeometryList : public Geometry {
    public:

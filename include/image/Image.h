@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Color.h"
+#include "Common.h"
 #include "ProgressBar.h"
 #include "Renderer.h"
 #include "Scene.h"

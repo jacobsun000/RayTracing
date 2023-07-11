@@ -4,7 +4,7 @@
 #include <initializer_list>
 #include <iostream>
 
-#include "Math.h"
+#include "MathUtils.h"
 
 template <typename T, size_t N>
 class Vec {

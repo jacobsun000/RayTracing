@@ -4,8 +4,7 @@
 #include <sstream>
 #include <string>
 
-#include "Common.h"
-#include "Math.h"
+#include "MathUtils.h"
 #include "Vector.h"
 
 using Color = Vec3d;
