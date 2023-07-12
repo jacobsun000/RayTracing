@@ -4,11 +4,12 @@
 #include <string>
 
 void showProgressBar(double progress) {
-    const int barWidth = 70;
+    std::cout << "\033[?25l";
+    const int barWidth = 50;
     int filledWidth = static_cast<int>(progress * barWidth);
 
     std::string progressBar;
-    progressBar += "[";
+    progressBar += "Rendering [";
     for (int i = 0; i < barWidth; ++i) {
         if (i < filledWidth)
             progressBar += "=";
@@ -22,4 +23,5 @@ void showProgressBar(double progress) {
 
     std::cout << progressBar << "\r";
     std::cout.flush();
+    std::cout << "\033[?25h";
 }

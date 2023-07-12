@@ -1,6 +1,10 @@
 #pragma once
 
+#include <atomic>
+#include <thread>
+
 #include "Color.h"
+#include "Common.h"
 #include "Geometry.h"
 #include "Image.h"
 #include "Material.h"
@@ -28,12 +32,21 @@ struct RenderOption {
 };
 
 class Renderer {
-   private:
+   protected:
     Scene _scene;
 
    public:
     Renderer(Scene scene) : _scene(scene) {}
-    void render(RenderOption option, Image& output) {
+    virtual ~Renderer() = default;
+    virtual void render(RenderOption option, Image& output) = 0;
+};
+
+using RendererPtr = shared_ptr<Renderer>;
+
+class CPU_ST_Renderer : public Renderer {
+   public:
+    CPU_ST_Renderer(Scene scene) : Renderer(scene) {}
+    void render(RenderOption option, Image& output) override {
         int width = output.width;
         int height = output.height;
         int samples_per_pixel = option.samples_per_pixel;
@@ -49,9 +62,73 @@ class Renderer {
                     Ray r = _scene.camera.get_ray(u, v);
                     pixel_color += ray_color(r, _scene.objects, max_depth);
                 }
-                Pixel color = color_to_rgb<int>(pixel_color, samples_per_pixel);
+                Pixel color =
+                    color_to_rgb<ComponentType>(pixel_color, samples_per_pixel);
                 output.data[height - y - 1][x] = color;
             }
+        }
+    }
+};
+
+class CPU_MT_Renderer : public Renderer {
+   public:
+    CPU_MT_Renderer(Scene scene) : Renderer(scene) {}
+
+    void render(RenderOption option, Image& output) override {
+        int width = output.width;
+        int height = output.height;
+        int samples_per_pixel = option.samples_per_pixel;
+        int max_depth = option.max_depth;
+        unsigned int num_threads = std::thread::hardware_concurrency();
+        // unsigned int num_threads = 4;
+
+        vector<std::thread> threads(num_threads);
+        std::atomic<int> completed_rows{0};
+
+        int rows_per_thread = height / num_threads;
+        int extra_rows = height % num_threads;  // 计算不能整除的剩余行数
+        int start_y = 0;
+        int end_y = rows_per_thread;
+
+        for (unsigned int thread_id = 0; thread_id < num_threads; ++thread_id) {
+            if (extra_rows > 0) {
+                end_y++;
+                extra_rows--;
+            }
+            threads[thread_id] = std::thread([this, &output, &completed_rows,
+                                              thread_id, start_y, end_y, width,
+                                              height, samples_per_pixel,
+                                              max_depth]() {
+                for (int y = start_y; y < end_y; ++y) {
+                    ++completed_rows;
+                    for (int x = 0; x < width; ++x) {
+                        Color pixel_color{0, 0, 0};
+                        for (int s = 0; s < samples_per_pixel; ++s) {
+                            auto u = (x + Math::random_double()) / (width - 1);
+                            auto v = (y + Math::random_double()) / (height - 1);
+                            Ray r = _scene.camera.get_ray(u, v);
+                            pixel_color +=
+                                ray_color(r, _scene.objects, max_depth);
+                        }
+                        Pixel color = color_to_rgb<ComponentType>(
+                            pixel_color, samples_per_pixel);
+                        output.data[height - y - 1][x] = color;
+                    }
+                }
+            });
+            start_y = end_y;
+            end_y += rows_per_thread;
+        }
+
+        while (completed_rows < height - 1) {
+            showProgressBar(static_cast<double>(completed_rows) / (height - 1));
+            std::this_thread::sleep_for(std::chrono::duration<double>(0.5));
+        }
+        std::cout << std::endl;
+
+        // 等待所有线程完成渲染
+        for (auto& thread : threads) {
+            thread.join();
         }
     }
 };

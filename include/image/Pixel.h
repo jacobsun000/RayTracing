@@ -2,4 +2,5 @@
 
 #include "Vector.h"
 
-using Pixel = Vec<int, 3>;
+using ComponentType = int;
+using Pixel = Vec<ComponentType, 3>;
