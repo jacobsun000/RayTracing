@@ -4,16 +4,23 @@
 
 #include "Camera.h"
 #include "Image.h"
-#include "RenderingOption.h"
+#include "Renderer.h"
 #include "Scene.h"
+#include "SceneBuilder.h"
 
 using namespace Math;
 
 int main(int argc, char const *argv[]) {
-    double aspect_ratio = 3.0 / 2.0;
-    RenderingOption option(aspect_ratio, 400,
-                           static_cast<int>(400 / aspect_ratio), 100, 50);
-    GeometryList objects = Scene::random();
+    double aspect_ratio = 16.0 / 9.0;
+    int width = 200;
+    int height = static_cast<int>(width / aspect_ratio);
+    int samples_per_pixel = 100;
+    int max_depth = 50;
+    std::string outfile = "test.ppm";
+
+    ImageOption imageOption{width, height};
+    RenderOption renderOption{samples_per_pixel, max_depth};
+    GeometryList objects = SceneBuilder::random();
 
     Point3d lookfrom{13, 2, 3};
     Point3d lookat{0, 0, 0};
@@ -24,8 +31,10 @@ int main(int argc, char const *argv[]) {
     Camera camera(lookfrom, lookat, vup, 20, aspect_ratio, aperture,
                   dist_to_focus);
 
-    Scene scene(camera, objects, option);
-    PPM_Image image(scene, "test.ppm");
+    Scene scene(camera, objects);
+    PPM_Image image(imageOption, outfile);
+    Renderer renderer(scene);
+    renderer.render(renderOption, image);
     image.write();
     return 0;
 }

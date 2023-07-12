@@ -157,10 +157,10 @@ class Vec {
     friend std::ostream& operator<<(std::ostream& os, const Vec<T, N>& vec) {
         os << "[ ";
         os << vec[0];
-        for (std::size_t i = 0; i < N; i++) {
+        for (std::size_t i = 1; i < N; i++) {
             os << ", " << vec[i];
         }
-        os << "]";
+        os << " ]";
         return os;
     }
 
