@@ -17,8 +17,9 @@ inline double rad_to_deg(double radians) { return radians / PI * 180.0; }
 
 inline double random_double() {
     // Returns a random real in [0,1).
-    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    static std::mt19937 generator;
+    thread_local std::minstd_rand generator(std::random_device{}());
+    thread_local std::uniform_real_distribution<double> distribution(0.0, 1.0);
+
     return distribution(generator);
 }
 

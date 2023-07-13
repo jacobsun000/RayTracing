@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Common.h"
 #include "GeometryList.h"
+#include "Plane.h"
 #include "Sphere.h"
 
 class Scene {
