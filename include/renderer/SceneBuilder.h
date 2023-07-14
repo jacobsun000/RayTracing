@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Dielectric.h"
+#include "Lambertian.h"
+#include "Metal.h"
 #include "Scene.h"
 
 class SceneBuilder {

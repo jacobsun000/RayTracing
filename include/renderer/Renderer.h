@@ -80,13 +80,12 @@ class CPU_MT_Renderer : public Renderer {
         int samples_per_pixel = option.samples_per_pixel;
         int max_depth = option.max_depth;
         unsigned int num_threads = std::thread::hardware_concurrency();
-        // unsigned int num_threads = 4;
 
         vector<std::thread> threads(num_threads);
         std::atomic<int> completed_rows{0};
 
         int rows_per_thread = height / num_threads;
-        int extra_rows = height % num_threads;  // 计算不能整除的剩余行数
+        int extra_rows = height % num_threads;
         int start_y = 0;
         int end_y = rows_per_thread;
 
@@ -126,7 +125,6 @@ class CPU_MT_Renderer : public Renderer {
         }
         std::cout << std::endl;
 
-        // 等待所有线程完成渲染
         for (auto& thread : threads) {
             thread.join();
         }

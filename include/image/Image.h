@@ -29,6 +29,9 @@ class Image {
 };
 
 class PPM_Image : public Image {
+   private:
+    std::string _filename;
+
    public:
     PPM_Image(ImageOption option, const std::string& filename)
         : Image(option), _filename(filename) {}
@@ -42,7 +45,4 @@ class PPM_Image : public Image {
             }
         }
     }
-
-   private:
-    std::string _filename;
 };

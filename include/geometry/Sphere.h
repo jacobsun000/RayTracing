@@ -3,6 +3,10 @@
 #include "Geometry.h"
 
 class Sphere : public Geometry {
+   private:
+    Point3d _center;
+    double _radius;
+
    public:
     Sphere(Point3d center, double radius, shared_ptr<Material> material)
         : Geometry(material), _center(center), _radius(radius) {}
@@ -32,8 +36,4 @@ class Sphere : public Geometry {
 
         return true;
     }
-
-   private:
-    Point3d _center;
-    double _radius;
 };

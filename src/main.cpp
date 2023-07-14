@@ -11,10 +11,10 @@
 
 int main(int argc, char const *argv[]) {
     double aspect_ratio = 16.0 / 9.0;
-    int width = 1920;
+    int width = 400;
     int height = static_cast<int>(width / aspect_ratio);
-    int samples_per_pixel = 400;
-    int max_depth = 100;
+    int samples_per_pixel = 100;
+    int max_depth = 50;
     std::string outfile = "test.ppm";
 
     ImageOption imageOption{width, height};

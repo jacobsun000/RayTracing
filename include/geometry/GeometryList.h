@@ -5,6 +5,9 @@
 #include "Geometry.h"
 
 class GeometryList : public Geometry {
+   private:
+    std::vector<shared_ptr<Geometry>> _geometries;
+
    public:
     GeometryList() : Geometry(nullptr) {}
     GeometryList(shared_ptr<Geometry> object) : Geometry(nullptr) {
@@ -29,7 +32,4 @@ class GeometryList : public Geometry {
         }
         return hit_anything;
     }
-
-   private:
-    std::vector<shared_ptr<Geometry>> _geometries;
 };

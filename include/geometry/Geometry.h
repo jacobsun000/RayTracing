@@ -20,13 +20,13 @@ struct HitRecord {
 };
 
 class Geometry {
+   protected:
+    shared_ptr<Material> _material;
+
    public:
     Geometry(shared_ptr<Material> material) : _material(material) {}
     virtual ~Geometry() = default;
     // Returns normal
     virtual bool hit(const Ray& ray, double t_min, double t_max,
                      HitRecord& r_rec) const = 0;
-
-   protected:
-    shared_ptr<Material> _material;
 };
