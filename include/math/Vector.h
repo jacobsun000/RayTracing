@@ -8,11 +8,13 @@
 
 template <typename T, size_t N>
 class Vec {
-   public:
+    public:
     Vec() { _data.fill(T()); }
 
+    // Fill length N vector with value of type T
     Vec(T value) { _data.fill(value); }
 
+    // Fill length N vector with a list
     Vec(std::initializer_list<T> values) {
         if (values.size() != N) {
             throw std::runtime_error("Invalid initializer list size");
@@ -41,8 +43,10 @@ class Vec {
         return _data[2];
     }
 
+    // Magnitude of vector
     T length() const { return sqrt(length_squared()); }
 
+    // Square length of vector
     T length_squared() const {
         T result = 0;
         for (const auto& value : _data) {
@@ -51,15 +55,16 @@ class Vec {
         return result;
     }
 
+    // Return a new unit vector of current vector
     Vec<T, N> unit_vector() const { return (*this) / length(); }
 
+    // Return true if the vector is close to zero in all dimensions.
     bool near_zero() const {
-        // Return true if the vector is close to zero in all dimensions.
         const auto s = 1e-8;
-        return (fabs(_data[0]) < s) && (fabs(_data[1]) < s) &&
-               (fabs(_data[2]) < s);
+        return (fabs(_data[0]) < s) && (fabs(_data[1]) < s) && (fabs(_data[2]) < s);
     }
 
+    // Dot product of vector with another vector
     T dot(const Vec<T, N>& other) const {
         T result = 0;
         for (size_t i = 0; i < N; ++i) {
@@ -68,6 +73,8 @@ class Vec {
         return result;
     }
 
+    // Cross product of vector with another vector.
+    // Only availiable in Vec<T, 3>
     Vec<T, N> cross(const Vec<T, N>& other) const {
         static_assert(
             N == 3, "Cross product is only defined for 3-dimensional vectors.");
@@ -78,6 +85,7 @@ class Vec {
         return result;
     }
 
+    // Map each component of a vector to a new vector using func
     template <typename U = T>
     Vec<U, N> map(std::function<U(T)> func) const {
         Vec<U, N> result;
@@ -87,6 +95,7 @@ class Vec {
         return result;
     }
 
+    // Map each component of a vector to a new vector using func
     template <typename U = T>
     Vec<U, N> map(std::function<U(T, size_t)> func) const {
         Vec<U, N> result;
@@ -96,6 +105,7 @@ class Vec {
         return result;
     }
 
+    // Apply func to each component of a vector
     Vec<T, N>& apply(std::function<void(T&)> func) {
         for (T& value : _data) {
             func(value);
@@ -103,6 +113,7 @@ class Vec {
         return *this;
     }
 
+    // Apply func to each component of a vector
     Vec<T, N>& apply(std::function<void(T&, size_t)> func) {
         for (size_t i = 0; i < N; i++) {
             func(_data[i], i);
@@ -115,43 +126,63 @@ class Vec {
     const T& operator[](size_t index) const { return _data[index]; }
 
     Vec<T, N> operator-() const {
-        return map<T>([](T val) { return -val; });
+        return map<T>([](T val) {
+            return -val;
+        });
     }
 
     Vec<T, N> operator+(const Vec<T, N>& other) const {
-        return map<T>([&](T val, size_t i) { return val + other[i]; });
+        return map<T>([&](T val, size_t i) {
+            return val + other[i];
+        });
     }
 
     Vec<T, N> operator-(const Vec<T, N>& other) const {
-        return map<T>([&](T val, size_t i) { return val - other[i]; });
+        return map<T>([&](T val, size_t i) {
+            return val - other[i];
+        });
     }
 
     Vec<T, N> operator*(const Vec<T, N>& other) const {
-        return map<T>([&](T val, size_t i) { return val * other[i]; });
+        return map<T>([&](T val, size_t i) {
+            return val * other[i];
+        });
     }
 
     Vec<T, N> operator*(const T& scalar) const {
-        return map<T>([&](T val) { return val * scalar; });
+        return map<T>([&](T val) {
+            return val * scalar;
+        });
     }
 
     Vec<T, N> operator/(const T& scalar) const {
-        return map<T>([&](T val) { return val / scalar; });
+        return map<T>([&](T val) {
+            return val / scalar;
+        });
     }
 
     Vec<T, N>& operator+=(const Vec<T, N>& other) {
-        return apply([&](T& val, size_t i) { val += other[i]; });
+        return apply([&](T& val, size_t i) {
+            val += other[i];
+        });
     }
 
     Vec<T, N>& operator-=(const Vec<T, N>& other) {
-        return apply([&](T& val, size_t i) { val -= other[i]; });
+        return apply([&](T& val, size_t i) {
+            val -= other[i];
+        });
     }
 
     Vec<T, N>& operator*=(const Vec<T, N>& other) {
-        return apply([&](T& val, size_t i) { val *= other[i]; });
+        return apply([&](T& val, size_t i) {
+            val *= other[i];
+        });
     }
 
     Vec<T, N>& operator/=(const Vec<T, N>& other) {
-        return apply([&](T& val, size_t i) { val /= other[i]; });
+        return apply([&](T& val, size_t i) {
+            val /= other[i];
+        });
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Vec<T, N>& vec) {
@@ -169,16 +200,20 @@ class Vec {
     }
 
     static Vec<T, N> random(double min, double max) {
-        auto rand = [&]() { return Math::random_double(min, max); };
-        return {rand(), rand(), rand()};
+        auto rand = [min, max]() {
+            return Math::random_double(min, max);
+        };
+        return { rand(), rand(), rand() };
     }
 
     static Vec<T, N> random() {
-        auto rand = []() { return Math::random_double(); };
-        return {rand(), rand(), rand()};
+        auto rand = []() {
+            return Math::random_double();
+        };
+        return { rand(), rand(), rand() };
     }
 
-   private:
+    private:
     std::array<T, N> _data;
 };
 
